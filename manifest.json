@@ -1,5 +1,5 @@
 {
-	"name": "Action script injection demo",
+	"name": "WebScreen Extension",
 	"version": "1.0",
 	"manifest_version": 3,
 	"icons": {
@@ -9,7 +9,7 @@
 		"128": "icon.png"
 	},
 	"action": {
-		"default_title": "Click to show an alert"
+		"default_title": "URL to Movie"
 	},
 	"permissions": [
 		"activeTab",

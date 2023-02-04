@@ -1,11 +1,19 @@
+async function copyToClipboard(text) {
+	try {
+		await navigator.clipboard.writeText(text);
+		alert('Copied to clipboard!');
+	} catch (err) {
+		console.error('Failed to copy text: ', err);
+	}
+}
+
 async function fetchMovieURL() {
 	const url = window.location.href;
-	alert(url);
 	const input_data = {
 		url: url,
-		lang: 'ja-JP',
-		page_height: '5000',
-		wait_time: 1
+		lang: window.navigator.language,
+		page_height: '20000',
+		wait_time: 5
 	};
 	const options = {
 		method: 'POST',
@@ -23,6 +31,7 @@ async function fetchMovieURL() {
 async function main() {
 	let url = await fetchMovieURL();
 	console.log('url: ' + url);
+	await copyToClipboard(url);
 }
 
 main();
