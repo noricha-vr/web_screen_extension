@@ -12,17 +12,6 @@ function updateProgress(value) {
 	document.getElementById("progressbar").value = value;
 }
 
-async function copyToClipboard(text) {
-	let result = true;
-	try {
-		navigator.clipboard.writeText(text);
-	} catch (err) {
-		result = false;
-		console.error('Failed to copy text: ', err);
-	}
-	return result;
-}
-
 async function fetchMovieURL(post_url) {
 	const url = window.location.href;
 	const input_data = {
@@ -50,7 +39,11 @@ async function main() {
 	let input_url = await getUrl();
 	// let movie_url = await fetchMovieURL(input_url);
 	let movie_url = input_url;
-	document.getElementById('movie_url').value = movie_url;
-	alert('movie_url: ' + movie_url);
+	let input_text = document.getElementById('movie_url')
+	input_text.value = movie_url;
+	// copy input text value to clipboard
+	input_text.select();
+	input_text.setSelectionRange(0, 99999);
+	document.execCommand("copy");
 }
 main();
