@@ -8,8 +8,14 @@ async function getUrl() {
 	return "";
 }
 
+function updateProgress(value) {
+	document.getElementById("progressbar").value = value;
+}
+
 async function main() {
 	let url = await getUrl();
+	let value = 50;
+	updateProgress(value);
 	alert('current utl: ' + url);
 }
 main();
