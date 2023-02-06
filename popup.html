@@ -6,27 +6,22 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" href="./popup.css" />
+	<meta title="WebScreen" />
 </head>
 
 <body>
-	<template id="li_template">
-		<li>
-			<a>
-				<h3 class="title">WebScreen</h3>
-			</a>
-		</li>
-	</template>
-
-	<h1>WebScreen</h1>
-	<h2>動画に変換中</h2>
-	<progress id="progressbar" value="0" max="100"></progress>
-
-	<h2>動画に変換しました。</h2>
-	<input id="movie_url" type="text" />
-	<!-- <h2>動画のURLをクリップボードに保存しました。</h2>
-	<h2>VRChatの動画プレイヤーに貼り付けてください。</h2> -->
-	<!-- <button>COPY</button>
-	<input type="text" / id="output_url"> -->
+	<img id="header-image" src="./img/header.png" alt="web screen">
+	<dev id="progress-area">
+		<progress id="progress-bar" value="0" max="100"></progress>
+		<div class="loading-message">動画に変換中</div>
+	</dev>
+	<div id="success-area">
+		<input id="movie_url" type="text" />
+		<div id="success-message">
+			動画のURLをクリップボードに保存しました。<br />
+			VRChatの動画プレイヤーに貼り付けてください。
+		</div>
+	</div>
 	<script src="./popup.js" type="module"></script>
 </body>
 

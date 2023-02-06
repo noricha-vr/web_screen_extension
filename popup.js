@@ -1,3 +1,6 @@
+let progressValue = 0;
+let progressBar = document.getElementById("progress-bar");
+
 async function getUrl() {
 	let queryOptions = { active: true, currentWindow: true };
 	let tabs = await chrome.tabs.query(queryOptions);
@@ -8,8 +11,12 @@ async function getUrl() {
 	return "";
 }
 
-function updateProgress(value) {
-	document.getElementById("progressbar").value = value;
+function updateProgress() {
+	if (progressValue >= 100) {
+		progressValue = 0;
+	}
+	progressValue += 1;
+	progressBar.value = progressValue;
 }
 
 async function fetchMovieURL(post_url) {
@@ -34,16 +41,17 @@ async function fetchMovieURL(post_url) {
 }
 
 async function main() {
-	// let value = 100;
-	// updateProgress(value);
+	let interval = setInterval(updateProgress, 100);
 	let input_url = await getUrl();
-	// let movie_url = await fetchMovieURL(input_url);
-	let movie_url = input_url;
+	let movie_url = await fetchMovieURL(input_url);
+	// let movie_url = input_url;
 	let input_text = document.getElementById('movie_url')
 	input_text.value = movie_url;
 	// copy input text value to clipboard
 	input_text.select();
 	input_text.setSelectionRange(0, 99999);
 	document.execCommand("copy");
+	clearInterval(interval);
+	progressBar.value = 0;
 }
 main();
