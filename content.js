@@ -28,10 +28,8 @@ async function fetchMovieURL() {
 	return output_data['url'];
 }
 
-async function main() {
+async () => {
 	let url = await fetchMovieURL();
 	console.log('url: ' + url);
 	await copyToClipboard(url);
 }
-
-main();
