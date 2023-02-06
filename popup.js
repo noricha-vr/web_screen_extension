@@ -1,5 +1,9 @@
+const progressBar = document.getElementById("progress-bar");
+const progressArea = document.getElementById("progress-area");
+const successArea = document.getElementById("success-area");
+const inputText = document.getElementById('movie_url')
+const copyButton = document.getElementById('copy-button');
 let progressValue = 0;
-let progressBar = document.getElementById("progress-bar");
 
 async function getUrl() {
 	let queryOptions = { active: true, currentWindow: true };
@@ -20,7 +24,7 @@ function updateProgress() {
 }
 
 async function fetchMovieURL(post_url) {
-	const url = window.location.href;
+	const API_URL = 'https://web-screen.net/api/url-to-movie/';
 	const input_data = {
 		url: post_url,
 		lang: window.navigator.language,
@@ -34,24 +38,32 @@ async function fetchMovieURL(post_url) {
 		},
 		body: JSON.stringify(input_data)
 	};
-	let response = await fetch('https://web-screen.net/api/url-to-movie/', options);
+	let response = await fetch(API_URL, options);
 	let output_data = await response.json();
 	console.log(output_data);
 	return output_data['url'];
 }
 
+function clickCopy() {
+	inputText.select();
+	inputText.setSelectionRange(0, 99999);
+	document.execCommand("copy");
+}
+copyButton.addEventListener('click', clickCopy);
+
 async function main() {
+	successArea.style.display = 'none';
+	progressArea.style.display = '';
 	let interval = setInterval(updateProgress, 100);
 	let input_url = await getUrl();
 	let movie_url = await fetchMovieURL(input_url);
-	// let movie_url = input_url;
-	let input_text = document.getElementById('movie_url')
-	input_text.value = movie_url;
+	inputText.value = movie_url;
 	// copy input text value to clipboard
-	input_text.select();
-	input_text.setSelectionRange(0, 99999);
-	document.execCommand("copy");
+	clickCopy();
 	clearInterval(interval);
 	progressBar.value = 0;
+	progressArea.style.display = 'none';
+	successArea.style.display = '';
 }
 main();
+
