@@ -33,7 +33,7 @@ progress::-webkit-progress-value {
 .loading-message {
 	margin-top: 0.5em;
 	font-size: 1em;
-	color: gray;
+	color: #494949;
 }
 
 input#movie_url {
