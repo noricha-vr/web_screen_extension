@@ -50,9 +50,9 @@ async function fetchMovieURL(post_url) {
 	}
 }
 
-function clickCopy() {
-	inputText.select();
-	inputText.setSelectionRange(0, 99999);
+function clickCopy(element) {
+	element.select();
+	element.setSelectionRange(0, 99999);
 	document.execCommand("copy");
 }
 copyButton.addEventListener('click', clickCopy);
@@ -70,7 +70,7 @@ async function main() {
 	progressBar.value = 0;
 	progressArea.style.display = 'none';
 	successArea.style.display = '';
-	clickCopy();
+	clickCopy(inputText);
 	insertHistory(input_url, movie_url, 7);
 }
 main();
