@@ -28,6 +28,8 @@ async function fetchMovieURL() {
 	return output_data['url'];
 }
 
+
+
 async () => {
 	let url = await fetchMovieURL();
 	console.log('url: ' + url);

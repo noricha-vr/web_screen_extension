@@ -4,8 +4,8 @@ const successArea = document.getElementById("success-area");
 const inputText = document.getElementById('movie_url')
 const copyButton = document.getElementById('copy-button');
 let progressValue = 0;
-import { insertHistory, getHistories } from './historyHandler.js';
-
+import { insertHistory, getHistories, showHistory } from './historyHandler.js';
+import { clickCopy } from './utils.js';
 
 async function getUrl() {
 	let queryOptions = { active: true, currentWindow: true };
@@ -50,15 +50,10 @@ async function fetchMovieURL(post_url) {
 	}
 }
 
-function clickCopy(text_element) {
-	text_element.select();
-	text_element.setSelectionRange(0, 99999);
-	document.execCommand("copy");
-}
 copyButton.addEventListener('click', () => { clickCopy(inputText) });
 
 async function main() {
-	console.log(getHistories());
+	showHistory(getHistories());
 	successArea.style.display = 'none';
 	progressArea.style.display = '';
 	let interval = setInterval(updateProgress, 150);
