@@ -4,7 +4,7 @@ const successArea = document.getElementById("success-area");
 const inputText = document.getElementById('movie_url')
 const copyButton = document.getElementById('copy-button');
 let progressValue = 0;
-import { insertHistory, getHistories } from './dbHandler.js';
+import { insertHistory, getHistories } from './historyHandler.js';
 
 
 async function getUrl() {
