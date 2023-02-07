@@ -4,52 +4,7 @@ const successArea = document.getElementById("success-area");
 const inputText = document.getElementById('movie_url')
 const copyButton = document.getElementById('copy-button');
 let progressValue = 0;
-
-const dbName = "WebScreen";
-const storeName = "historyStore";
-
-function insertToHistory(input_url, movie_url) {
-	let currentTime = new Date().toString();
-	let history = {
-		input_url: input_url,
-		timestamp: currentTime,
-		movie_url: movie_url
-	};
-
-	let request = window.indexedDB.open(dbName, 1);
-	request.onsuccess = function (event) {
-		let db = event.target.result;
-		let tx = db.transaction(storeName, "readwrite");
-		let store = tx.objectStore(storeName);
-		store.put(history);
-		store.onsuccess = function (event) {
-			console.log("History saved successfully!");
-		};
-		store.onerror = function (event) {
-			// Handle constraint error
-			if (event.target.error.name === "ConstraintError") {
-				console.log("Deleting existing history for input_url: ", input_url);
-				store.delete(input_url);
-				store.put(history);
-			} else {
-				console.error("Error saving history: ", event.target.error);
-			}
-		};
-		tx.oncomplete = function () {
-			console.log("Transaction complete.");
-		};
-		tx.onerror = function (event) {
-			console.error("Transaction error: ", event.target.error);
-		};
-	};
-	request.onupgradeneeded = function (event) {
-		let db = event.target.result;
-		db.createObjectStore(storeName, { keyPath: "input_url", autoIncrement: true });
-	};
-	request.onerror = function (event) {
-		console.error("Error opening database: ", event.target.error);
-	};
-}
+import { insertHistory, getHistories } from './dbHandler.js';
 
 
 async function getUrl() {
@@ -103,6 +58,7 @@ function clickCopy() {
 copyButton.addEventListener('click', clickCopy);
 
 async function main() {
+	console.log(getHistories());
 	successArea.style.display = 'none';
 	progressArea.style.display = '';
 	let interval = setInterval(updateProgress, 150);
@@ -115,7 +71,7 @@ async function main() {
 	progressArea.style.display = 'none';
 	successArea.style.display = '';
 	clickCopy();
-	insertToHistory(input_url, movie_url);
+	insertHistory(input_url, movie_url, 7);
 }
 main();
 
