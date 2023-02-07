@@ -50,12 +50,12 @@ async function fetchMovieURL(post_url) {
 	}
 }
 
-function clickCopy(element) {
-	element.select();
-	element.setSelectionRange(0, 99999);
+function clickCopy(text_element) {
+	text_element.select();
+	text_element.setSelectionRange(0, 99999);
 	document.execCommand("copy");
 }
-copyButton.addEventListener('click', clickCopy);
+copyButton.addEventListener('click', () => { clickCopy(inputText) });
 
 async function main() {
 	console.log(getHistories());
