@@ -38,10 +38,14 @@ async function fetchMovieURL(post_url) {
 		},
 		body: JSON.stringify(input_data)
 	};
-	let response = await fetch(API_URL, options);
-	let output_data = await response.json();
-	console.log(output_data);
-	return output_data['url'];
+	try {
+		let response = await fetch(API_URL, options);
+		let output_data = await response.json();
+		console.log(output_data);
+		return output_data['url'];
+	} catch (err) {
+		return 'Convert failed.'
+	}
 }
 
 function clickCopy() {
@@ -59,11 +63,11 @@ async function main() {
 	let movie_url = await fetchMovieURL(input_url);
 	inputText.value = movie_url;
 	// copy input text value to clipboard
-	clickCopy();
 	clearInterval(interval);
 	progressBar.value = 0;
 	progressArea.style.display = 'none';
 	successArea.style.display = '';
+	clickCopy();
 }
 main();
 
