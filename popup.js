@@ -58,7 +58,7 @@ copyButton.addEventListener('click', clickCopy);
 async function main() {
 	successArea.style.display = 'none';
 	progressArea.style.display = '';
-	let interval = setInterval(updateProgress, 100);
+	let interval = setInterval(updateProgress, 150);
 	let input_url = await getUrl();
 	let movie_url = await fetchMovieURL(input_url);
 	inputText.value = movie_url;
