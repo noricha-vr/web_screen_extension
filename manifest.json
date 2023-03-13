@@ -18,5 +18,11 @@
 	],
 	"background": {
 		"service_worker": "background.js"
+	},
+	"host_permissions": [
+		"https://web-screen.net/*"
+	],
+	"content_security_policy": {
+		"extension_pages": "script-src 'self'; object-src 'self'"
 	}
 }
