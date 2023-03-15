@@ -34,6 +34,7 @@ chrome.storage.local.get(["historyList", "autoCopy"], function (result) {
 });
 
 
+
 function updateProgress() {
 	if (progressValue >= 100) {
 		progressValue = 0;
@@ -173,7 +174,7 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 		inputText.value = movieUrl;
 		addHistoryItem(request.inputUrl, movieUrl);
 		if (autoCopyCheckbox.checked) {
-			chrome.runtime.sendMessage({ type: "copyToClipboard", text: movieUrl });
+			navigator.clipboard.writeText(movieUrl);
 		}
 		let historyItem = {
 			inputUrl: request.inputUrl,
