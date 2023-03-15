@@ -9,7 +9,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 			if (scrollPosition >= totalHeight) {
 				// スクロールが完了したら、screenshotListをpopup.jsに送信する ここの実装をお願いします。
 				console.log(screenshotList);
-				chrome.runtime.sendMessage({ command: "screenshotList", data: screenshotList }, function (response) {
+				chrome.runtime.sendMessage({ command: "screenshotList", data: screenshotList, inputUrl: window.location.href }, function (response) {
 					console.log(response);
 				});
 

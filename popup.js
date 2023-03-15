@@ -8,6 +8,7 @@ const convertButton = document.getElementById("convert-button");
 const autoCopyCheckbox = document.getElementById("autoCopy");
 let historyList = [];
 let progressValue = 0;
+let interval = null;
 
 async function getUrl() {
 	let queryOptions = { active: true, currentWindow: true };
@@ -58,40 +59,52 @@ convertButton.addEventListener("click", function () {
 	progressArea.style.display = '';
 	successArea.style.display = 'none';
 	convertButton.style.display = 'none';
+	setInterval(updateProgress, 150);
 	chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 		chrome.tabs.sendMessage(tabs[0].id, { command: "start" });
 	});
 });
 
 
-async function convertToMovie() {
-	progressArea.style.display = '';
-	successArea.style.display = 'none';
-	convertButton.style.display = 'none';
-	let interval = setInterval(updateProgress, 150);
 
-	let inputUrl = await getUrl();
-	let movieUrl = await fetchMovieURL(inputUrl);
-	inputText.value = movieUrl;
-	// copy input text value to clipboard
-	clearInterval(interval);
-	progressBar.value = 0;
-	progressArea.style.display = 'none';
-	successArea.style.display = '';
-	convertButton.style.display = '';
-	inputText.value = movieUrl;
-	addHistoryItem(inputUrl, movieUrl);
-	if (autoCopyCheckbox.checked) {
-		navigator.clipboard.writeText(movieUrl);
-	}
-	let historyItem = {
-		inputUrl: inputUrl,
-		movieUrl: movieUrl,
-		createdDate: new Date()
-	};
-	historyList.push(historyItem);
-	chrome.storage.local.set({ "historyList": historyList });
+async function convertToHD(dataURL) {
+	return new Promise(function (resolve, reject) {
+		let img = new Image();
+		img.onload = function () {
+			let canvas = document.createElement("canvas");
+			let width = img.width;
+			let height = img.height;
+			let aspectRatio = width / height;
+			if (width > 1280 || height > 720) {
+				if (aspectRatio > 1) {
+					width = 1280;
+					height = width / aspectRatio;
+				} else {
+					height = 720;
+					width = height * aspectRatio;
+				}
+			}
+			canvas.width = width;
+			canvas.height = height;
+			let ctx = canvas.getContext("2d");
+			ctx.drawImage(img, 0, 0, width, height);
+			resolve(canvas.toDataURL("image/png"));
+		};
+		img.src = dataURL;
+	});
 }
+
+export function dataURItoBlob(dataURI) {
+	let byteString = atob(dataURI.split(",")[1]);
+	let mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
+	let ab = new ArrayBuffer(byteString.length);
+	let ia = new Uint8Array(ab);
+	for (let i = 0; i < byteString.length; i++) {
+		ia[i] = byteString.charCodeAt(i);
+	}
+	return new Blob([ab], { type: mimeString });
+}
+
 
 copyButton.addEventListener('click', () => {
 	navigator.clipboard.writeText(inputText.value);
@@ -140,6 +153,7 @@ function addHistoryItem(inputUrl, movieUrl) {
 
 	historyArea.appendChild(itemDiv);
 }
+
 chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
 	if (request.command === "screenshotList") {
 		let screenshotList = request.data;
@@ -152,41 +166,28 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 			hdScreenshotList.push(hdDataURL);
 		}
 
-		let movieURL = await postScreenshotsToServer(hdScreenshotList);
-		console.log('movieURL', movieURL);
-
+		let movieUrl = await postScreenshotsToServer(hdScreenshotList);
+		console.log('movieURL', movieUrl);
+		clearInterval(interval);
+		progressBar.value = 0;
+		progressArea.style.display = 'none';
+		successArea.style.display = '';
+		convertButton.style.display = '';
+		inputText.value = movieUrl;
+		addHistoryItem(request.inputUrl, movieUrl);
+		if (autoCopyCheckbox.checked) {
+			navigator.clipboard.writeText(movieUrl);
+		}
+		let historyItem = {
+			inputUrl: inputUrl,
+			movieUrl: movieUrl,
+			createdDate: new Date()
+		};
+		historyList.push(historyItem);
+		chrome.storage.local.set({ "historyList": historyList });
 		sendResponse({ message: "screenshotList received" });
 	}
 });
-
-async function convertToHD(dataURL) {
-	return new Promise(function (resolve, reject) {
-		let canvas = document.createElement("canvas");
-		let ctx = canvas.getContext("2d");
-		let img = new Image();
-
-		img.onload = function () {
-			canvas.width = img.width * 2;
-			canvas.height = img.height * 2;
-			ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-			resolve(canvas.toDataURL("image/png"));
-		};
-
-		img.src = dataURL;
-	});
-}
-
-function dataURItoBlob(dataURI) {
-	let byteString = atob(dataURI.split(",")[1]);
-	let mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
-	let ab = new ArrayBuffer(byteString.length);
-	let ia = new Uint8Array(ab);
-	for (let i = 0; i < byteString.length; i++) {
-		ia[i] = byteString.charCodeAt(i);
-	}
-	return new Blob([ab], { type: mimeString });
-}
 
 async function postScreenshotsToServer(screenshotList) {
 	const API_URL = 'https://web-screen.net/api/image-to-movie/';
@@ -209,8 +210,6 @@ async function postScreenshotsToServer(screenshotList) {
 	}
 	return 'Convert failed.';
 }
-
-
 
 
 window.onload = async () => {
