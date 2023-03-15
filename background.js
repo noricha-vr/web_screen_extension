@@ -13,7 +13,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 		chrome.downloads.download({
 			url: request.movieUrl,
 			filename: request.domain + ".mp4",
-			saveAs: true
+			saveAs: false
 		}, function (downloadId) {
 			sendResponse("Download started");
 		});

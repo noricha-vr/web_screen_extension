@@ -162,10 +162,9 @@ function createCopyButton(movieUrl) {
 function createDownloadButton(inputUrl, movieUrl) {
 	const downloadButton = document.createElement("a");
 	downloadButton.textContent = "DL";
-	downloadButton.href = movieUrl;
-	downloadButton.download = inputUrl.split('/')[2] + ".mp4";
 	downloadButton.classList = "btn btn-outline-secondary btn-sm me-2";
 	downloadButton.addEventListener("click", () => {
+		event.preventDefault();
 		chrome.runtime.sendMessage(
 			{ movieUrl: movieUrl, domain: inputUrl.split('/')[2] },
 			function (response) {
