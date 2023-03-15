@@ -175,9 +175,13 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 		addHistoryItem(request.inputUrl, movieUrl);
 		console.log("autoCopy", autoCopy);
 		if (autoCopy) {
-			navigator.clipboard.writeText(movieUrl).then(() => {
-				alert("Copied!" + movieUrl);
-			});
+			// inputTextを選択し、全て範囲指定する。その後、コピーする。
+			inputText.select();
+			document.execCommand("copy");
+			copyButton.textContent = "Copied!";
+			setTimeout(() => {
+				copyButton.textContent = "Copy";
+			}, 10000);
 		}
 		let historyItem = {
 			inputUrl: request.inputUrl,
