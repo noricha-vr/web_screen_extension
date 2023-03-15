@@ -13,17 +13,24 @@
 	<a href="https://web-screen.net/" target="_blank">
 		<img id="header-image" src="./img/header.png" alt="web screen">
 	</a>
-	<dev id="progress-area">
+	<button id="convert-button" class="btn btn-primary">このページを動画に変換</button>
+	<dev id="progress-area" style="display:none">
 		<progress id="progress-bar" value="0" max="100"></progress>
 		<div class="loading-message">動画に変換中</div>
 	</dev>
-	<div id="success-area">
+	<div id="success-area" style="display:none">
 		<input id="movie_url" type="text" /><br />
 		<button id="copy-button">COPY</button>
 		<div id="success-message">
 			動画のURLをクリップボードに保存しました。<br />
 			VRChatの動画プレイヤーに貼り付けてください。
 		</div>
+	</div>
+	<div>
+		<label>
+			<input type="checkbox" id="autoCopy" class="checkbox me-2" />
+			URLを自動でコピーする
+		</label>
 	</div>
 	<script src="./popup.js" type="module"></script>
 </body>

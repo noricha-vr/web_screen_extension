@@ -48,17 +48,16 @@ async function fetchMovieURL(post_url) {
 	}
 }
 
-function clickCopy() {
-	inputText.select();
-	inputText.setSelectionRange(0, 99999);
-	document.execCommand("copy");
-}
-copyButton.addEventListener('click', clickCopy);
+const convertButton = document.getElementById("convert-button");
+const autoCopyCheckbox = document.getElementById("autoCopy");
+convertButton.addEventListener("click", convertToMovie);
 
-async function main() {
-	successArea.style.display = 'none';
+async function convertToMovie() {
 	progressArea.style.display = '';
+	successArea.style.display = 'none';
+	convertButton.style.display = 'none';
 	let interval = setInterval(updateProgress, 150);
+
 	let input_url = await getUrl();
 	let movie_url = await fetchMovieURL(input_url);
 	inputText.value = movie_url;
@@ -67,7 +66,21 @@ async function main() {
 	progressBar.value = 0;
 	progressArea.style.display = 'none';
 	successArea.style.display = '';
-	clickCopy();
+	convertButton.style.display = '';
+	inputText.value = movie_url;
+	if (autoCopyCheckbox.checked) {
+		clickCopy();
+	}
 }
-main();
+
+
+function clickCopy() {
+	inputText.select();
+	inputText.setSelectionRange(0, 99999);
+	document.execCommand("copy");
+}
+copyButton.addEventListener('click', clickCopy);
+
+window.load = async () => {
+}
 
