@@ -9,13 +9,12 @@ const autoCopyCheckbox = document.getElementById("auto-copy");
 let historyList = [];
 let progressValue = 0;
 let interval = null;
+let autoCopy = false;
 
 autoCopyCheckbox.addEventListener("change", function () {
-	if (autoCopyCheckbox.checked) {
-		chrome.storage.local.set({ autoCopy: true });
-	} else {
-		chrome.storage.local.set({ autoCopy: false });
-	}
+	autoCopy = autoCopyCheckbox.checked;
+	chrome.storage.local.set({ autoCopy: autoCopy });
+	console.log('Save autoCopy', autoCopy);
 });
 
 // Load history list and set auto copy checkbox.
@@ -29,6 +28,7 @@ chrome.storage.local.get(["historyList", "autoCopy"], function (result) {
 		historyList = [];
 	}
 	if (result.autoCopy) {
+		autoCopy = result.autoCopy;
 		autoCopyCheckbox.checked = result.autoCopy;
 	}
 });
@@ -173,8 +173,11 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 		successArea.style.display = '';
 		inputText.value = movieUrl;
 		addHistoryItem(request.inputUrl, movieUrl);
-		if (autoCopyCheckbox.checked) {
-			navigator.clipboard.writeText(movieUrl);
+		console.log("autoCopy", autoCopy);
+		if (autoCopy) {
+			navigator.clipboard.writeText(movieUrl).then(() => {
+				alert("Copied!" + movieUrl);
+			});
 		}
 		let historyItem = {
 			inputUrl: request.inputUrl,
