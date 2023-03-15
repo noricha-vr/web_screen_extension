@@ -34,16 +34,6 @@ chrome.storage.local.get(["historyList", "autoCopy"], function (result) {
 });
 
 
-async function getUrl() {
-	let queryOptions = { active: true, currentWindow: true };
-	let tabs = await chrome.tabs.query(queryOptions);
-	if (tabs[0] === undefined) {
-		return "";
-	}
-	if (tabs[0].url) return tabs[0].url;
-	return "";
-}
-
 function updateProgress() {
 	if (progressValue >= 100) {
 		progressValue = 0;
@@ -51,33 +41,6 @@ function updateProgress() {
 	progressValue += 1;
 	progressBar.value = progressValue;
 }
-
-
-async function fetchMovieURL(post_url) {
-	const API_URL = 'https://web-screen.net/api/url-to-movie/';
-	const input_data = {
-		url: post_url,
-		lang: window.navigator.language,
-		page_height: '20000',
-		wait_time: 5
-	};
-	const options = {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify(input_data)
-	};
-	try {
-		let response = await fetch(API_URL, options);
-		let output_data = await response.json();
-		console.log(output_data);
-		return output_data['url'];
-	} catch (err) {
-		return 'Convert failed.'
-	}
-}
-
 
 convertButton.addEventListener("click", function () {
 	progressArea.style.display = '';
@@ -88,8 +51,6 @@ convertButton.addEventListener("click", function () {
 		chrome.tabs.sendMessage(tabs[0].id, { command: "start" });
 	});
 });
-
-
 
 async function convertToHD(dataURL) {
 	return new Promise(function (resolve, reject) {
@@ -188,8 +149,7 @@ function addHistoryItem(inputUrl, movieUrl) {
 		itemDiv.remove();
 	});
 	itemDiv.appendChild(deleteButton);
-
-	historyArea.appendChild(itemDiv);
+	historyArea.insertBefore(itemDiv, historyArea.firstChild); // 最初の子要素の前に新しい要素を挿入する
 }
 
 chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
