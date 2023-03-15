@@ -1,14 +1,38 @@
 const progressBar = document.getElementById("progress-bar");
 const progressArea = document.getElementById("progress-area");
 const successArea = document.getElementById("success-area");
-const inputText = document.getElementById('movie_url')
+const inputText = document.getElementById('movie-url')
 const copyButton = document.getElementById('copy-button');
 const historyArea = document.getElementById("history-area");
 const convertButton = document.getElementById("convert-button");
-const autoCopyCheckbox = document.getElementById("autoCopy");
+const autoCopyCheckbox = document.getElementById("auto-copy");
 let historyList = [];
 let progressValue = 0;
 let interval = null;
+
+autoCopyCheckbox.addEventListener("change", function () {
+	if (autoCopyCheckbox.checked) {
+		chrome.storage.local.set({ autoCopy: true });
+	} else {
+		chrome.storage.local.set({ autoCopy: false });
+	}
+});
+
+// Load history list and set auto copy checkbox.
+chrome.storage.local.get(["historyList", "autoCopy"], function (result) {
+	if (result.historyList) {
+		historyList = result.historyList;
+		historyList.forEach((item) => {
+			addHistoryItem(item.inputUrl, item.movieUrl);
+		});
+	} else {
+		historyList = [];
+	}
+	if (result.autoCopy) {
+		autoCopyCheckbox.checked = result.autoCopy;
+	}
+});
+
 
 async function getUrl() {
 	let queryOptions = { active: true, currentWindow: true };
@@ -107,17 +131,29 @@ export function dataURItoBlob(dataURI) {
 
 
 copyButton.addEventListener('click', () => {
-	navigator.clipboard.writeText(inputText.value);
+
+	navigator.clipboard.writeText(inputText.value).then(() => {
+		copyButton.textContent = "Copied!";
+		setTimeout(() => {
+			copyButton.textContent = "Copy";
+		}, 10000);
+	});
 });
 
 function addHistoryItem(inputUrl, movieUrl) {
 	const itemDiv = document.createElement("div");
-	itemDiv.classList.add("history-item");
+	itemDiv.classList.add("mb-1");
 
 	const copyButton = document.createElement("button");
 	copyButton.textContent = "Copy";
+	copyButton.classList = "btn btn-outline-primary btn-sm me-1";
 	copyButton.addEventListener("click", () => {
-		navigator.clipboard.writeText(movieUrl);
+		navigator.clipboard.writeText(movieUrl).then(() => {
+			copyButton.textContent = "Copied!";
+			setTimeout(() => {
+				copyButton.textContent = "Copy";
+			}, 10000);
+		});
 	});
 	itemDiv.appendChild(copyButton);
 
@@ -125,7 +161,7 @@ function addHistoryItem(inputUrl, movieUrl) {
 	downloadButton.textContent = "DL";
 	downloadButton.href = movieUrl;
 	downloadButton.download = inputUrl.split('/')[2] + ".mp4";
-	downloadButton.classList = "btn btn-primary";
+	downloadButton.classList = "btn btn-outline-secondary btn-sm me-2";
 	downloadButton.addEventListener("click", () => {
 		chrome.runtime.sendMessage(
 			{ movieUrl: movieUrl, domain: inputUrl.split('/')[2] },
@@ -142,10 +178,12 @@ function addHistoryItem(inputUrl, movieUrl) {
 	link.textContent = inputUrl.split('/')[2];
 	link.href = movieUrl;
 	link.target = "_blank";
+	link.classList = "me-2";
 	itemDiv.appendChild(link);
 
 	const deleteButton = document.createElement("button");
-	deleteButton.textContent = "Delete";
+	deleteButton.textContent = "x";
+	deleteButton.id = "delete-button";
 	deleteButton.addEventListener("click", () => {
 		itemDiv.remove();
 	});
@@ -172,19 +210,22 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 		progressBar.value = 0;
 		progressArea.style.display = 'none';
 		successArea.style.display = '';
-		convertButton.style.display = '';
 		inputText.value = movieUrl;
 		addHistoryItem(request.inputUrl, movieUrl);
 		if (autoCopyCheckbox.checked) {
 			navigator.clipboard.writeText(movieUrl);
 		}
 		let historyItem = {
-			inputUrl: inputUrl,
+			inputUrl: request.inputUrl,
 			movieUrl: movieUrl,
 			createdDate: new Date()
 		};
 		historyList.push(historyItem);
-		chrome.storage.local.set({ "historyList": historyList });
+		chrome.storage.local.set({ "historyList": historyList }, function () {
+			if (chrome.runtime.lastError) {
+				console.error("Error while saving historyList:", chrome.runtime.lastError);
+			}
+		});
 		sendResponse({ message: "screenshotList received" });
 	}
 });
@@ -211,17 +252,4 @@ async function postScreenshotsToServer(screenshotList) {
 	return 'Convert failed.';
 }
 
-
-window.onload = async () => {
-	chrome.storage.local.get("historyList", function (result) {
-		if (result.historyList) {
-			historyList = result.historyList;
-			historyList.forEach((item) => {
-				addHistoryItem(item.inputUrl, item.movieUrl);
-			});
-		} else {
-			historyList = [];
-		}
-	});
-}
 

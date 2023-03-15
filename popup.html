@@ -14,14 +14,15 @@
 	<a href="https://web-screen.net/" target="_blank">
 		<img id="header-image" src="./img/header.png" alt="web screen">
 	</a>
-	<button id="convert-button" class="btn btn-primary mb-2">このページを動画に変換</button>
+	<button id="convert-button" class="btn btn-primary btn-sm mb-2">このページを動画に変換</button>
 	<dev id="progress-area" style="display:none">
 		<progress id="progress-bar" value="0" max="100"></progress>
 		<div class="loading-message">動画に変換中</div>
 	</dev>
+
 	<div id="success-area" style="display:none">
-		<input id="movie_url" type="text" /><br />
-		<button id="copy-button">COPY</button>
+		<input id="movie-url" type="text" class="form-control m-auto w-100 mb-1" />
+		<button id="copy-button" class="btn btn-outline-primary btn-sm w-100">COPY</button>
 		<div id="success-message">
 			動画のURLをクリップボードに保存しました。<br />
 			VRChatの動画プレイヤーに貼り付けてください。
@@ -29,7 +30,7 @@
 	</div>
 	<div>
 		<label>
-			<input type="checkbox" id="autoCopy" class="checkbox me-2" />
+			<input type="checkbox" id="auto-copy" class="checkbox me-2" />
 			URLを自動でコピーする
 		</label>
 	</div>
