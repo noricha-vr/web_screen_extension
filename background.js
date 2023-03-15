@@ -8,6 +8,7 @@ chrome.action.onClicked.addListener((tab) => {
 // background.js
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+	console.log(request);
 	if (request.movieUrl && request.domain) {
 		chrome.downloads.download({
 			url: request.movieUrl,
@@ -16,22 +17,16 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 		}, function (downloadId) {
 			sendResponse("Download started");
 		});
-	}
-	return true;
-});
-
-
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-	if (request.command === "capture") {
+	} else if (request.command === "capture") {
 		// スクリーンショットを取得する
 		chrome.tabs.captureVisibleTab(null, { format: "png" }, function (dataURL) {
 			sendResponse({ dataURL: dataURL });
 		});
-
-		// 非同期処理であるため、trueを返してレスポンスが返るまで待機する
-		return true;
 	}
+	// 非同期処理であるため、trueを返してレスポンスが返るまで待機する
+	return true;
 });
+
 
 function convertToMovie(screenshotList) {
 	// screenshotListを連結して、動画を生成する
