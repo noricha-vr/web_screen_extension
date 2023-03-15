@@ -5,9 +5,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 		let totalHeight = document.documentElement.scrollHeight;
 		let screenshotList = [];
 
-		function scrollAndCapture() {
-			if (scrollPosition >= totalHeight) {
-				// スクロールが完了したら、screenshotListをpopup.jsに送信する ここの実装をお願いします。
+		// 最大スクロールピクセル数を設定する
+		const maxScrollPixels = 20000;
+
+		async function scrollAndCapture() {
+			if (scrollPosition >= totalHeight || scrollPosition >= maxScrollPixels) {
+				// スクロールが完了したら、screenshotListをpopup.jsに送信する
 				console.log(screenshotList);
 				chrome.runtime.sendMessage({ command: "screenshotList", data: screenshotList, inputUrl: window.location.href }, function (response) {
 					console.log(response);
@@ -20,21 +23,25 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 			window.scrollTo(0, scrollPosition);
 
 			// スクリーンショットを取得する
-			chrome.runtime.sendMessage({ command: "capture" }, function (response) {
-				screenshotList.push(response.dataURL);
-
-				// スクロール位置を更新する
-				scrollPosition += screenHeight / 3;
-
-				// 1秒間待機してから、次のスクロールとスクリーンショットを実行する
-				setTimeout(scrollAndCapture, 500);
+			const response = await new Promise(resolve => {
+				chrome.runtime.sendMessage({ command: "capture" }, function (response) {
+					resolve(response);
+				});
 			});
+			screenshotList.push(response.dataURL);
+
+			// スクロール位置を更新する
+			scrollPosition += screenHeight / 3;
+
+			// 次のスクロールとスクリーンショットを実行する
+			setTimeout(scrollAndCapture, 500);
 		}
 
 		// スクロールとスクリーンショットの処理を開始する
 		scrollAndCapture();
 	}
 });
+
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 	if (request.command === "capture") {
