@@ -27,6 +27,7 @@ function updateProgress() {
 	progressBar.value = progressValue;
 }
 
+
 async function fetchMovieURL(post_url) {
 	const API_URL = 'https://web-screen.net/api/url-to-movie/';
 	const input_data = {
@@ -53,7 +54,15 @@ async function fetchMovieURL(post_url) {
 }
 
 
-convertButton.addEventListener("click", convertToMovie);
+convertButton.addEventListener("click", function () {
+	progressArea.style.display = '';
+	successArea.style.display = 'none';
+	convertButton.style.display = 'none';
+	chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+		chrome.tabs.sendMessage(tabs[0].id, { command: "start" });
+	});
+});
+
 
 async function convertToMovie() {
 	progressArea.style.display = '';
@@ -131,6 +140,77 @@ function addHistoryItem(inputUrl, movieUrl) {
 
 	historyArea.appendChild(itemDiv);
 }
+chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
+	if (request.command === "screenshotList") {
+		let screenshotList = request.data;
+		console.log(screenshotList);
+
+		let hdScreenshotList = [];
+
+		for (let i = 0; i < screenshotList.length; i++) {
+			let hdDataURL = await convertToHD(screenshotList[i]);
+			hdScreenshotList.push(hdDataURL);
+		}
+
+		let movieURL = await postScreenshotsToServer(hdScreenshotList);
+		console.log('movieURL', movieURL);
+
+		sendResponse({ message: "screenshotList received" });
+	}
+});
+
+async function convertToHD(dataURL) {
+	return new Promise(function (resolve, reject) {
+		let canvas = document.createElement("canvas");
+		let ctx = canvas.getContext("2d");
+		let img = new Image();
+
+		img.onload = function () {
+			canvas.width = img.width * 2;
+			canvas.height = img.height * 2;
+			ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+			resolve(canvas.toDataURL("image/png"));
+		};
+
+		img.src = dataURL;
+	});
+}
+
+function dataURItoBlob(dataURI) {
+	let byteString = atob(dataURI.split(",")[1]);
+	let mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
+	let ab = new ArrayBuffer(byteString.length);
+	let ia = new Uint8Array(ab);
+	for (let i = 0; i < byteString.length; i++) {
+		ia[i] = byteString.charCodeAt(i);
+	}
+	return new Blob([ab], { type: mimeString });
+}
+
+async function postScreenshotsToServer(screenshotList) {
+	const API_URL = 'https://web-screen.net/api/image-to-movie/';
+	let formData = new FormData();
+	for (let i = 0; i < screenshotList.length; i++) {
+		let blobData = dataURItoBlob(screenshotList[i]);
+		formData.append('images', blobData, `screenshot_${i}.png`);
+	}
+	try {
+		let response = await fetch(API_URL, {
+			method: "POST",
+			body: formData,
+		});
+
+		let result = await response.json();
+		return result.url;
+	} catch (error) {
+		console.log(error);
+		alert('Error: Please try again.', error);
+	}
+	return 'Convert failed.';
+}
+
+
 
 
 window.onload = async () => {
