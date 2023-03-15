@@ -173,7 +173,7 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 		inputText.value = movieUrl;
 		addHistoryItem(request.inputUrl, movieUrl);
 		if (autoCopyCheckbox.checked) {
-			navigator.clipboard.writeText(movieUrl);
+			chrome.runtime.sendMessage({ type: "copyToClipboard", text: movieUrl });
 		}
 		let historyItem = {
 			inputUrl: request.inputUrl,

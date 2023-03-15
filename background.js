@@ -33,31 +33,14 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 	}
 });
 
-function convertToMovie(screenshotList) {
-	// screenshotListを連結して、動画を生成する
-	console.log(screenshotList);
-}
-
-// chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-// 	if (request.command === "start") {
-// 		let tabId = sender.tab.id;
-// 		let screenshotList = [];
-
-// 		chrome.tabs.executeScript(tabId, { file: "content-script.js" }, function () {
-// 			// コンテンツスクリプトを実行する
-// 			chrome.tabs.sendMessage(tabId, { command: "start" }, function () {
-// 				// スクリーンショットが取得されるたびに、screenshotListに追加する
-// 				chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-// 					if (request.command === "capture") {
-// 						screenshotList.push(request.dataURL);
-// 					}
-// 				});
-
-// 				// スクロールとスクリーンショットの処理が完了したら、動画に変換する
-// 				setTimeout(function () {
-// 					convertToMovie(screenshotList);
-// 				}, 3000);
-// 			});
-// 		});
-// 	}
-// });
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+	if (message.type === "copyToClipboard") {
+		navigator.clipboard.writeText(message.text)
+			.then(() => {
+				console.log("Text copied to clipboard");
+			})
+			.catch(err => {
+				console.error("Error copying text to clipboard", err);
+			});
+	}
+});
