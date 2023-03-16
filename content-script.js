@@ -6,7 +6,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 		let screenshotList = [];
 
 		// 最大スクロールピクセル数を設定する
-		const maxScrollPixels = 20000;
+		const maxScrollPixels = request.maxHeight;
+		console.log('maxScrollPixels', maxScrollPixels);
 
 		async function scrollAndCapture(currentScrollPosition) {
 			if (currentScrollPosition >= totalHeight || currentScrollPosition >= maxScrollPixels) {

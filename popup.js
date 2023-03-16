@@ -7,13 +7,17 @@ const copyButton = document.getElementById('copy-button');
 const historyArea = document.getElementById("history-area");
 const convertButton = document.getElementById("convert-button");
 const autoCopyCheckbox = document.getElementById("auto-copy");
+const maxHeight = document.getElementById("max-height");
+const maxHeightLabel = document.getElementById("max-height-label");
 
 let historyList = [];
 let progressValue = 0;
 let interval = null;
 let autoCopy = false;
 
-autoCopyCheckbox.addEventListener("change", handleAutoCopyCheckboxChange);
+autoCopyCheckbox.addEventListener("input", handleAutoCopyCheckboxChange);
+
+maxHeight.addEventListener("input", handleMaxHeightChange);
 
 chrome.storage.local.get(["historyList", "autoCopy"], loadSettings);
 
@@ -23,10 +27,18 @@ copyButton.addEventListener('click', handleCopyButtonClick);
 
 chrome.runtime.onMessage.addListener(handleRuntimeMessage);
 
+
+
 function handleAutoCopyCheckboxChange() {
 	autoCopy = autoCopyCheckbox.checked;
 	chrome.storage.local.set({ autoCopy: autoCopy });
 	console.log('Save autoCopy', autoCopy);
+}
+
+function handleMaxHeightChange() {
+	maxHeightLabel.textContent = maxHeight.value;
+	chrome.storage.local.set({ maxHeight: maxHeight.value });
+	console.log('Save maxHeight', maxHeight.value);
 }
 
 function loadSettings(result) {
@@ -48,8 +60,9 @@ function handleConvertButtonClick() {
 	screenshotMessage.style.display = '';
 	successArea.style.display = 'none';
 	convertButton.style.display = 'none';
+	// maxHeightを設定する
 	chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-		chrome.tabs.sendMessage(tabs[0].id, { command: "start" });
+		chrome.tabs.sendMessage(tabs[0].id, { command: "start", maxHeight: Number(maxHeight.value) });
 	});
 }
 
