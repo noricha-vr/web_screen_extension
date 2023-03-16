@@ -204,7 +204,8 @@ async function postScreenshotsToServer(screenshotList) {
 	let formData = new FormData();
 	for (let i = 0; i < screenshotList.length; i++) {
 		let blobData = dataURItoBlob(screenshotList[i]);
-		formData.append('images', blobData, `screenshot_${i}.png`);
+		let zeroFilledIndex = String(i).padStart(3, '0');
+		formData.append('images', blobData, `screenshot_${zeroFilledIndex}.png`);
 	}
 	try {
 		let response = await fetch(API_URL, {
