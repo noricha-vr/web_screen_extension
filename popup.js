@@ -71,9 +71,7 @@ async function handleRuntimeMessage(request, sender, sendResponse) {
 		let screenshotList = request.data;
 		console.log(screenshotList);
 
-		let hdScreenshotList = await convertScreenshotListToHD(screenshotList);
-
-		let movieUrl = await postScreenshotsToServer(hdScreenshotList);
+		let movieUrl = await postScreenshotsToServer(screenshotList);
 		console.log('movieURL', movieUrl);
 		clearInterval(interval);
 		progressBar.value = 0;
@@ -220,33 +218,6 @@ async function postScreenshotsToServer(screenshotList) {
 		alert('Error: Please try again.', error);
 	}
 	return 'Convert failed.';
-}
-
-async function convertToHD(dataURL) {
-	return new Promise(function (resolve, reject) {
-		let img = new Image();
-		img.onload = function () {
-			let canvas = document.createElement("canvas");
-			let width = img.width;
-			let height = img.height;
-			let aspectRatio = width / height;
-			if (width > 1280 || height > 720) {
-				if (aspectRatio > 1) {
-					width = 1280;
-					height = width / aspectRatio;
-				} else {
-					height = 720;
-					width = height * aspectRatio;
-				}
-			}
-			canvas.width = width;
-			canvas.height = height;
-			let ctx = canvas.getContext("2d");
-			ctx.drawImage(img, 0, 0, width, height);
-			resolve(canvas.toDataURL("image/png"));
-		};
-		img.src = dataURL;
-	});
 }
 
 export function dataURItoBlob(dataURI) {
