@@ -14,7 +14,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 				// スクロールが完了したら、screenshotListをpopup.jsに送信する前にソートする
 				screenshotList.sort((a, b) => a.scrollPosition - b.scrollPosition);
 				console.log(screenshotList);
-				chrome.runtime.sendMessage({ command: "screenshotList", data: screenshotList.map(item => item.dataURL), inputUrl: window.location.href }, function (response) {
+				chrome.runtime.sendMessage({ command: "screenshotList", data: screenshotList.map(item => item.dataURL), title: document.title }, function (response) {
 					console.log(response);
 				});
 

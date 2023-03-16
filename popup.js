@@ -45,7 +45,7 @@ function loadSettings(result) {
 	if (result.historyList) {
 		historyList = result.historyList;
 		historyList.forEach((item) => {
-			addHistoryItem(item.inputUrl, item.movieUrl);
+			addHistoryItem(item.title, item.movieUrl);
 		});
 	} else {
 		historyList = [];
@@ -91,9 +91,9 @@ async function handleRuntimeMessage(request, sender, sendResponse) {
 		progressArea.style.display = 'none';
 		successArea.style.display = '';
 		inputText.value = movieUrl;
-		addHistoryItem(request.inputUrl, movieUrl);
+		addHistoryItem(request.title, movieUrl);
 		handleAutoCopy();
-		saveHistoryItem(request.inputUrl, movieUrl);
+		saveHistoryItem(request.title, movieUrl);
 		sendResponse({ message: "screenshotList received" });
 	}
 }
@@ -120,9 +120,9 @@ function handleAutoCopy() {
 	}
 }
 
-function saveHistoryItem(inputUrl, movieUrl) {
+function saveHistoryItem(title, movieUrl) {
 	let historyItem = {
-		inputUrl: inputUrl,
+		title: title,
 		movieUrl: movieUrl,
 		createdDate: new Date()
 	};
@@ -143,21 +143,45 @@ function handleCopyButtonClick() {
 	});
 }
 
-function addHistoryItem(inputUrl, movieUrl) {
-	const itemDiv = createHistoryItemDiv(inputUrl, movieUrl);
+function addHistoryItem(title, movieUrl) {
+	const itemDiv = createHistoryItemDiv(title, movieUrl);
 	historyArea.insertBefore(itemDiv, historyArea.firstChild); // 最初の子要素の前に新しい要素を挿入する
 }
 
-function createHistoryItemDiv(inputUrl, movieUrl) {
+function createHistoryItemDiv(title, movieUrl) {
 	const itemDiv = document.createElement("div");
 	itemDiv.classList.add("mb-1");
 
 	itemDiv.appendChild(createCopyButton(movieUrl));
-	itemDiv.appendChild(createDownloadButton(inputUrl, movieUrl));
-	itemDiv.appendChild(createLink(inputUrl, movieUrl));
+	itemDiv.appendChild(createDownloadButton(title, movieUrl));
+	itemDiv.appendChild(createLink(truncateByLength(title, 20), movieUrl));
 	itemDiv.appendChild(createDeleteButton());
 
 	return itemDiv;
+}
+
+function countLength(str) {
+	let count = 0;
+	for (let i = 0; i < str.length; i++) {
+		const code = str.charCodeAt(i);
+		count += (code >= 0x0020 && code <= 0x007e) || (code >= 0xff61 && code <= 0xff9f) ? 1 : 2;
+	}
+	return count;
+}
+
+function truncateByLength(str, maxLength) {
+	let result = '';
+	let count = 0;
+	for (let i = 0; i < str.length; i++) {
+		const char = str[i];
+		const charLength = countLength(char);
+		if (count + charLength > maxLength) {
+			break;
+		}
+		result += char;
+		count += charLength;
+	}
+	return result;
 }
 
 function createCopyButton(movieUrl) {
@@ -175,14 +199,14 @@ function createCopyButton(movieUrl) {
 	return copyButton;
 }
 
-function createDownloadButton(inputUrl, movieUrl) {
+function createDownloadButton(title, movieUrl) {
 	const downloadButton = document.createElement("a");
 	downloadButton.textContent = "DL";
 	downloadButton.classList = "btn btn-outline-secondary btn-sm me-2";
 	downloadButton.addEventListener("click", () => {
 		event.preventDefault();
 		chrome.runtime.sendMessage(
-			{ movieUrl: movieUrl, domain: inputUrl.split('/')[2] },
+			{ movieUrl: movieUrl, title: title },
 			function (response) {
 				console.log(response);
 			}
@@ -191,9 +215,9 @@ function createDownloadButton(inputUrl, movieUrl) {
 	return downloadButton;
 }
 
-function createLink(inputUrl, movieUrl) {
+function createLink(title, movieUrl) {
 	const link = document.createElement("a");
-	link.textContent = inputUrl.split('/')[2];
+	link.textContent = title + "...";
 	link.href = movieUrl;
 	link.target = "_blank";
 	link.classList = "me-2";

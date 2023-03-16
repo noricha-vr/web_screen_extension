@@ -9,10 +9,10 @@ chrome.action.onClicked.addListener((tab) => {
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 	console.log(request);
-	if (request.movieUrl && request.domain) {
+	if (request.movieUrl && request.title) {
 		chrome.downloads.download({
 			url: request.movieUrl,
-			filename: request.domain + ".mp4",
+			filename: request.title + ".mp4",
 			saveAs: false
 		}, function (downloadId) {
 			sendResponse("Download started");
