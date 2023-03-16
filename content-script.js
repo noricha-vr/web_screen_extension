@@ -47,17 +47,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 	if (request.command === "capture") {
-		// 現在のスクロール位置を保存して一時的に固定する
-		const originalScrollPosition = document.documentElement.scrollTop;
-		document.documentElement.style.overflow = "hidden";
-		document.documentElement.scrollTop = request.currentScrollPosition;
-
 		// スクリーンショットを取得する
 		chrome.tabs.captureVisibleTab(null, { format: "png" }, function (dataURL) {
-			// スクロール位置を元に戻す
-			document.documentElement.style.overflow = "";
-			document.documentElement.scrollTop = originalScrollPosition;
-
 			sendResponse({ dataURL: dataURL });
 		});
 		// 非同期処理であるため、trueを返してレスポンスが返るまで待機する
