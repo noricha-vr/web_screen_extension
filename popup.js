@@ -1,6 +1,7 @@
 const progressBar = document.getElementById("progress-bar");
 const progressArea = document.getElementById("progress-area");
 const successArea = document.getElementById("success-area");
+const screenshotMessage = document.getElementById("screenshot-message");
 const inputText = document.getElementById('movie-url');
 const copyButton = document.getElementById('copy-button');
 const historyArea = document.getElementById("history-area");
@@ -44,10 +45,9 @@ function loadSettings(result) {
 }
 
 function handleConvertButtonClick() {
-	progressArea.style.display = '';
+	screenshotMessage.style.display = '';
 	successArea.style.display = 'none';
 	convertButton.style.display = 'none';
-	setInterval(updateProgress, 150);
 	chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 		chrome.tabs.sendMessage(tabs[0].id, { command: "start" });
 	});
@@ -63,6 +63,11 @@ function updateProgress() {
 
 async function handleRuntimeMessage(request, sender, sendResponse) {
 	if (request.command === "screenshotList") {
+		// Show and start progress bar
+		progressArea.style.display = '';
+		setInterval(updateProgress, 150);
+		screenshotMessage.style.display = 'none';
+
 		let screenshotList = request.data;
 		console.log(screenshotList);
 
