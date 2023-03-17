@@ -1,5 +1,23 @@
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 	if (request.command === "start") {
+		// url が file であるかどうかを判定する
+		if (document.URL.match(/^file:\/\//)) {
+			// pdfの場合、WebScreenのPDF変換のURLにリダイレクトする
+			if (document.URL.match(/\.pdf$/i)) {
+				window.location.href = "https://web-screen.net/pdf/";
+			} else if (document.URL.match(/\.(png|jpg|jpeg|gif|bmp|tiff)$/i)) {
+				// 画像ファイルならば、WebScreenの画像変換のURLにリダイレクトする
+				window.location.href = "https://web-screen.net/image/";
+			} else if (document.URL.match(/\.(mp4|avi|mkv|flv|mov|wmv)$/i)) {
+				// 動画ファイルならば、YouTubeのファイルアップロード画面のURLにリダイレクトする
+				window.location.href = "https://www.youtube.com/upload";
+			} else {
+				// それ以外のファイルならば、WebScreenのトップページにリダイレクトする
+				window.location.href = "https://web-screen.net/";
+			}
+			return;
+		}
+
 		let scrollPosition = 0;
 		let screenHeight = window.innerHeight;
 		let totalHeight = document.documentElement.scrollHeight;
