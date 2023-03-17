@@ -16,12 +16,12 @@
 	</a>
 	<button id="convert-button" class="btn btn-primary btn-sm mb-2">このページを動画に変換</button>
 	<div id="screenshot-message" class="loading-message text-center mb-2" style="display:none">
-		撮影中です…<br>画面がスクロールしない場合はページをリロードして再試行してください
+		<p>📷撮影中です…</p>画面がスクロールしない場合は<br />ページをリロードして再試行してください
 	</div>
 	<dev id="progress-area" style="display:none">
 		<progress id="progress-bar" value="0" max="100"></progress>
 		<div id="convert-message" class="loading-message">
-			動画に変換中…<br>
+			動画に変換中…⏳<br>
 			画面を閉じずにお待ちください
 		</div>
 	</dev>
@@ -29,8 +29,7 @@
 		<input id="movie-url" type="text" class="form-control m-auto w-100 mb-1" />
 		<button id="copy-button" class="btn btn-outline-primary btn-sm w-100">COPY</button>
 		<div id="success-message" class="mb-2">
-			動画のURLをクリップボードに保存しました。<br />
-			VRChatの動画プレイヤーに貼り付けてください。
+			URLをVRChatの動画プレイヤーに貼り付けてください。
 		</div>
 	</div>
 	<div>

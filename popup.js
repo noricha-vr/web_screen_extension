@@ -56,15 +56,35 @@ function loadSettings(result) {
 	}
 }
 
+
+function sendMessageWithRetry(retryCount) {
+	if (retryCount >= 5) {
+		alert("メッセージの送信に失敗しました。ページをリロードしてもう一度お試しください。\n問題が解決しない場合は、拡張機能を再インストールしてください。");
+		return;
+	}
+
+	chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+		chrome.tabs.sendMessage(tabs[0].id, { command: "start", maxHeight: Number(maxHeight.value) }, function (response) {
+			if (chrome.runtime.lastError) {
+				// エラーが発生した場合、1秒後にリトライする
+				setTimeout(() => {
+					sendMessageWithRetry(retryCount + 1);
+				}, 1000);
+			} else {
+				// メッセージ送信成功時の処理
+				console.log("Message sent successfully!");
+			}
+		});
+	});
+}
+
 function handleConvertButtonClick() {
 	screenshotMessage.style.display = '';
 	successArea.style.display = 'none';
 	convertButton.style.display = 'none';
-	// maxHeightを設定する
-	chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-		chrome.tabs.sendMessage(tabs[0].id, { command: "start", maxHeight: Number(maxHeight.value) });
-	});
+	sendMessageWithRetry(0);
 }
+
 
 function updateProgress() {
 	if (progressValue >= 100) {

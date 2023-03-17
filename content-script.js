@@ -1,5 +1,7 @@
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 	if (request.command === "start") {
+		// メッセージを受け取ったことを送信側に通知する
+		sendResponse({ status: "success" });
 		// url が file であるかどうかを判定する
 		if (document.URL.match(/^file:\/\//)) {
 			// pdfの場合、WebScreenのPDF変換のURLにリダイレクトする
