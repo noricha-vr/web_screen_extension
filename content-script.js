@@ -22,7 +22,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
 		let scrollPosition = 0;
 		let screenHeight = window.innerHeight;
-		let totalHeight = document.documentElement.scrollHeight;
+		let pageMaxHeight = document.documentElement.scrollHeight;
 		let screenshotList = [];
 
 		// 最大スクロールピクセル数を設定する
@@ -30,8 +30,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 		console.log('maxScrollPixels', maxScrollPixels);
 
 		async function scrollAndCapture(currentScrollPosition) {
-			if (currentScrollPosition >= totalHeight || currentScrollPosition >= maxScrollPixels) {
-				console.log('scrollAndCapture', 'currentScrollPosition', currentScrollPosition, 'totalHeight', totalHeight, 'maxScrollPixels', maxScrollPixels);
+			if (currentScrollPosition >= pageMaxHeight || currentScrollPosition >= maxScrollPixels) {
+				console.log('scrollAndCapture', 'currentScrollPosition', currentScrollPosition, 'totalHeight', pageMaxHeight, 'maxScrollPixels', maxScrollPixels);
 				// スクロールが完了したら、screenshotListをpopup.jsに送信する前にソートする
 				screenshotList.sort((a, b) => a.scrollPosition - b.scrollPosition);
 				console.log(screenshotList);
@@ -45,7 +45,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 			// スクロールする
 			window.scrollTo(0, currentScrollPosition);
 			// ページの高さを更新する
-			totalHeight = document.documentElement.scrollHeight;
+			pageMaxHeight = document.documentElement.scrollHeight;
 
 			// スクリーンショットを取得する
 			const response = await new Promise(resolve => {
@@ -61,7 +61,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 				const resizedDataURL = await convertToHD(response.dataURL);
 				screenshotList.push({ scrollPosition: currentScrollPosition, dataURL: resizedDataURL });
 				// スクロール位置を更新する
-				scrollPosition += screenHeight / 3;
+				scrollPosition += screenHeight / 4;
 			}
 
 			// 次のスクロールとスクリーンショットを実行する
