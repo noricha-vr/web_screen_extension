@@ -46,6 +46,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 			window.scrollTo(0, currentScrollPosition);
 			// ページの高さを更新する
 			pageMaxHeight = document.documentElement.scrollHeight;
+			console.log('scrollAndCapture', 'currentScrollPosition', currentScrollPosition, 'totalHeight', pageMaxHeight, 'maxScrollPixels', maxScrollPixels);
 
 			// スクリーンショットを取得する
 			const response = await new Promise(resolve => {
@@ -65,7 +66,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 			}
 
 			// 次のスクロールとスクリーンショットを実行する
-			setTimeout(() => scrollAndCapture(scrollPosition), 200);
+			setTimeout(() => scrollAndCapture(scrollPosition), 500);
 		}
 
 		// スクロールとスクリーンショットの処理を開始する
